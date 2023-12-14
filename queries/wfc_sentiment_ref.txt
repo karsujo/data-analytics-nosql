@@ -1,0 +1,48 @@
+If the list of words for positive and negative classification needs to be read from another document, you can use the $lookup stage in the MongoDB aggregation pipeline to fetch the list from another collection. Here's an example:
+
+Assume you have a collection named wordList with documents like this:
+
+json
+Copy code
+[
+  { "type": "positive", "words": ["good", "great", "nice", "pleasant"] },
+  { "type": "negative", "words": ["bad", "terrible"] }
+]
+Now, you can use the following MongoDB aggregation query:
+
+javascript
+Copy code
+db.yourCollectionName.aggregate([
+  {
+    $lookup: {
+      from: "wordList",
+      localField: "someFieldInYourCollection", // Adjust this field based on your schema
+      foreignField: "type",
+      as: "wordList"
+    }
+  },
+  {
+    $unwind: "$wordList"
+  },
+  {
+    $project: {
+      CustomerReview: 1,
+      review_classification: {
+        $cond: {
+          if: {
+            $regexMatch: {
+              input: "$CustomerReview",
+              regex: `(${'$wordList.words'.join('|')})`,
+              options: "i"
+            }
+          },
+          then: "$wordList.type",
+          else: "Neutral"
+        }
+      }
+    }
+  }
+])
+This example uses $lookup to join your collection with the wordList collection based on a common field (someFieldInYourCollection). The $unwind stage is used to flatten the array created by the $lookup stage, and then the $project stage applies the classification based on the regular expression match.
+
+Remember to adjust the localField in the $lookup stage based on your actual schema. Also, make sure to replace yourCollectionName with your collection's actual name.
