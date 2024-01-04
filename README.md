@@ -3,7 +3,7 @@
 # Instructions to compile and run
 
 ## Step 0 : 
-Setup the Mongo DB : Import the CustomersWithReviews.csv file into MongoDB
+Setup the Mongo DB : Import the HotelCustomersDataset_WithReviews.csv file into MongoDB
 
 ## Step 1 : venv setup
 
